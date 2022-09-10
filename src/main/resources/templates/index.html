@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <!-- 百度SEO -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="referrer" content="origin" />
+    <meta name="Access-Control-Allow-Origin" content="*" />
+    <meta name="site" content="http://suweibk.xyz:11521" />
+    <meta http-equiv="Access-Control-Allow-Origin" content="*" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>卢少自定义爬取影视改进中。。。</title>
+<!--    <link id="mobile-style" media="only screen and (max-width: 767px)" type="text/css" rel="stylesheet" href="/css/bundle-custom-mobile.min.css" />-->
+    <script th:src="@{/jquery.min3.3.1.js}"></script>
+    <script src="/layui2.7.4/layui.js" type="text/javascript"></script>
+    <link type="text/css" href="/layui2.7.4/css/layui.css" rel="stylesheet"/>
+    <style>
+        /*.layui-table-body .layui-table-cell {*/
+        .myImg {
+            width: 160px !important;
+            height: 170px !important;
+        }
+        /* 隐藏工具栏 */
+        .layui-table-tool {display: none}
+    </style>
+<style>
+</style>
+</head>
+<body>
+<div id="home">
+    <div id="main">
+        <div id="mainContent">
+            <div id="nav_title_b">
+<!--                <a th:href="@{/}" >全部</a><span id="seachTitle" class="nnnav_d" th:text="${navTitle}"></span>-->
+            </div>
+            <div class="forFlow">
+                <div class="layui-card">
+                    <div class="layui-card-body">
+                        <div class="headTools" style="display: flex">
+                            <select id="videoZD">
+                                <option value="">--全部--</option>
+                                <option value="1">樱花</option>
+                                <option value="2">飞极速</option>
+<!--                                <option value="3"></option>-->
+<!--                                <option value="4"></option>-->
+<!--                                <option value="5"></option>-->
+                            </select>
+                            <input type="text" id="keyword" class="layui-input" style="width: 300px;">
+                            <button class="layui-btn layui-btn-sm" onkeydown="enterQuery()" onclick="queryVideo()">查询</button>
+                        </div>
+                        <!-- 表格主体 -->
+                        <table class="layui-hide" id="listTable" lay-filter="listTable"></table>
+                    </div>
+                </div>
+            </div><!--end: forFlow -->
+        </div><!--end: mainContent 主体内容容器-->
+    </div><!--end: main -->
+</div><!--end: home 自定义的最大容器 -->
+</body>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $("#keyword").keydown(function(e){
+            let key = e.which;
+            if (key === 13) {
+                queryVideo();
+            }
+        });
+    });
+    let currTable;
+    layui.use(['element', 'form', 'layer', 'table','util'], function () {
+        let elemet = layui.element, form = layui.form, layer = layui.layer, table = layui.table, util = layui.util;
+        currTable = table.render({
+            elem: '#listTable'
+            ,url: '/video/search'
+            ,defaultToolbar:[] // 不显示默认工具栏
+            ,toolbar: '#headerTool'
+            ,cols: [
+                [
+                    {type: 'checkbox', fixed: 'left',hide: true}
+                    ,{field:'imgSrc', width:160,align:'right', title: '缩略图',templet: function (d) {
+                        return '<a class="imga" target="_blank" href="/video/videoList?zqType='+d.zqType+'&src='+d.descUrl+'"><img src="'+d.imgSrc+'"></a>';
+                    }}
+                    ,{field:'name', width:360,align:'left', title: '名称',templet:function (d) {
+                        return '<a target="_blank" href="/video/videoList?zqType='+d.zqType+'&src='+d.descUrl+'">'+d.name+'</a>';
+                    }}
+                    ,{field:'latest', width:500,align:'center', title: '最近更新'}
+                    // ,{field:'content', width:500,align:'center', hide: true,title: '设备名称',templet: apiFormat}
+                    // ,{field:'xh', width:70,align:'center', title: '序号',templet:function (d) {
+                    //     return d.LAY_TABLE_INDEX+1;
+                    // }}
+                    // ,{field:'descUrl', width:500,align:'center', title: '设备名称',templet: apiFormat}
+                    // ,{field:'status', width:80,align:'center', title: '出库',templet: function (d) {return d.status === 1 ? '已出库' : '未出库'}}
+                ]
+            ]
+            ,page: false
+            ,skin: 'row' //表格风格
+            // ,where:{
+            //     keyword: ''
+            // }
+            ,done:function () {
+                $(".imga").parent().addClass("myImg");
+            }
+        });
+// 原样显示xml或者html信息
+        function apiFormat(d){
+            return util.escape(d.content);
+        }
+        //头工具栏事件
+    });
+
+    function queryVideo() {
+        let keyword = $("#keyword").val().trim();
+        let zd = $("#videoZD").val();
+        currTable.reload({
+            where:{
+                keyword:keyword,
+                seachZd:zd
+            }
+        })
+    }
+
+</script>
+</html>
